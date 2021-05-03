@@ -28,9 +28,9 @@ public class NewOrderMain {
 
         // onde está o Kafka?
         properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
-        // de que tipo é a chave?
+        // de que tipo é a chave? -> configuração para serializar de string para byte
         properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        // de que tipo é a mensagem?
+        // de que tipo é a mensagem? -> configuração para serializar de string para byte
         properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         return properties;
     }

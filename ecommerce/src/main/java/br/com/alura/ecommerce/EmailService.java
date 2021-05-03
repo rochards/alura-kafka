@@ -8,19 +8,19 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Properties;
 
-public class FraudDetectorService {
+public class EmailService {
     public static void main(String[] args) {
         var consumer = new KafkaConsumer<String, String>(properties());
 
         // quer escutar quais tópicos?
-        consumer.subscribe(List.of("ECOMMERCE_NEW_ORDER"));
+        consumer.subscribe(List.of("ECOMMERCE_SEND_EMAIL"));
         while (true) {
             var records = consumer.poll(Duration.ofMillis(100));
             if (!records.isEmpty()) {
                 System.out.println("Encontrei " + records.count() + " registro(s)");
                 for (var record : records) {
                     System.out.println("---------------");
-                    System.out.println("Processing new order, checking for fraud");
+                    System.out.println("Send email");
                     System.out.println("key: " + record.key());
                     System.out.println("message/value: " + record.value());
                     System.out.println("partition: " + record.partition());
@@ -30,7 +30,7 @@ public class FraudDetectorService {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    System.out.println("Order processed");
+                    System.out.println("Email sent");
                 }
             }
         }
@@ -45,7 +45,7 @@ public class FraudDetectorService {
         /* um consumer precisa de um grupo configurado.
         Se tiver mais de um serviço em um mesmo grupo fica difícil saber qual serviço recebeu qual mensagem, mas no
         final todas serão processadas. */
-        properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, FraudDetectorService.class.getSimpleName());
+        properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, EmailService.class.getSimpleName());
 
         return properties;
     }

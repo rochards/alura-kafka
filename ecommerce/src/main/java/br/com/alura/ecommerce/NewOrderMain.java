@@ -1,5 +1,6 @@
 package br.com.alura.ecommerce;
 
+import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -12,15 +13,22 @@ public class NewOrderMain {
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         // esses properties poderia ser na verdade um arquivo
         var producer = new KafkaProducer<String, String>(properties());
-        var value = "1234134, 1245, 1234.00";
-        var record = new ProducerRecord<>("ECOMMERCE_NEW_ORDER", value, value);
-        producer.send(record, (data, ex) -> { // send é assíncrono, por isso damos um get
+        Callback listener = (data, ex) -> {
             if (ex != null) {
                 ex.printStackTrace();
                 return;
             }
             System.out.println("sucesso " + data.topic() + "::partition " + data.partition() + "/ offset " + data.offset() + "/ timestamp " + data.timestamp());
-        }).get();
+        };
+
+        var value = "1234134, 1245, 1234.00";
+        var record = new ProducerRecord<>("ECOMMERCE_NEW_ORDER", "Order", value);
+        producer.send(record, listener) // send é assíncrono, por isso damos um get
+                .get();
+
+        var email = "We are processing your order!";
+        var emailRecord = new ProducerRecord<>("ECOMMERCE_SEND_EMAIL", "Email", email);
+        producer.send(emailRecord, listener).get();
     }
 
     private static Properties properties() {

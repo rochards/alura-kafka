@@ -4,8 +4,9 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 public class EmailService {
     public static void main(String[] args) {
-        var service = new KafkaService(EmailService.class.getSimpleName(),"ECOMMERCE_SEND_EMAIL", EmailService::parse);
-        service.run();
+        try (var service = new KafkaService(EmailService.class.getSimpleName(),"ECOMMERCE_SEND_EMAIL", EmailService::parse)){
+            service.run();
+        }
     }
 
     private static void parse(ConsumerRecord<String, String> record) {
@@ -16,7 +17,7 @@ public class EmailService {
         System.out.println("partition: " + record.partition());
         System.out.println("offset: " + record.offset());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

@@ -7,7 +7,8 @@ import java.util.regex.Pattern;
 public class LogService {
     public static void main(String[] args) {
 
-        try (var logService = new KafkaService(LogService.class.getSimpleName(), Pattern.compile("ECOMMERCE.*"), LogService::parse)) {
+        try (var logService = new KafkaService<>(LogService.class.getSimpleName(), Pattern.compile("ECOMMERCE.*"),
+                LogService::parse, String.class)) {
             logService.run();
         }
     }

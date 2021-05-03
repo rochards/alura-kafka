@@ -44,8 +44,10 @@ public class FraudDetectorService {
 
         /* um consumer precisa de um grupo configurado.
         Se tiver mais de um serviço em um mesmo grupo fica difícil saber qual serviço recebeu qual mensagem, mas no
-        final todas serão processadas. */
+        final todas serão processadas. Isso se aplica quando as tópicos estão particionados. */
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, FraudDetectorService.class.getSimpleName());
+        // só indica que quero processar um registro por vez
+        properties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "1");
 
         return properties;
     }

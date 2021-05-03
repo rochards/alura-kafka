@@ -7,6 +7,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import java.io.Closeable;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -16,18 +17,21 @@ public class KafkaService<T> implements Closeable {
     private final KafkaConsumer<String, T> consumer;
     private final ConsumerFunction<T> parse;
 
-    private KafkaService(String groupIdName, ConsumerFunction<T> parse, Class<T> type) {
-        this.consumer = new KafkaConsumer<>(properties(type, groupIdName));
+    private KafkaService(String groupIdName, ConsumerFunction<T> parse, Class<T> type, Map<String,
+            String> properties) {
+        this.consumer = new KafkaConsumer<>(getProperties(type, groupIdName, properties));
         this.parse = parse;
     }
 
-    public KafkaService(String groupIdName, String topic, ConsumerFunction<T> parse, Class<T> type) {
-        this(groupIdName, parse, type);
+    public KafkaService(String groupIdName, String topic, ConsumerFunction<T> parse, Class<T> type, Map<String,
+            String> properties) {
+        this(groupIdName, parse, type, properties);
         consumer.subscribe(List.of(topic));
     }
 
-    public KafkaService(String groupIdName, Pattern topics, ConsumerFunction<T> parse, Class<T> type) {
-        this(groupIdName, parse, type);
+    public KafkaService(String groupIdName, Pattern topics, ConsumerFunction<T> parse, Class<T> type, Map<String,
+            String> properties) {
+        this(groupIdName, parse, type, properties);
         consumer.subscribe(topics);
     }
 
@@ -43,7 +47,7 @@ public class KafkaService<T> implements Closeable {
         }
     }
 
-    private Properties properties(Class<T> type, String groupIdName) {
+    private Properties getProperties(Class<T> type, String groupIdName, Map<String, String> overrideProperties) {
         var properties = new Properties();
         properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
         properties.setProperty(ConsumerConfig.CLIENT_ID_CONFIG, UUID.randomUUID().toString());
@@ -56,6 +60,7 @@ public class KafkaService<T> implements Closeable {
         properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, GsonDeserializer.class.getName());
         properties.setProperty(GsonDeserializer.TYPE_CONFIG, type.getName());
+        properties.putAll(overrideProperties);
 
         return properties;
     }

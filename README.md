@@ -14,3 +14,5 @@ Nesse projeto é mostrado como construir serializadores e desserializadores cust
 - Maven 3.6.3 ou superior;
 
 Para subir os serviços do docker-compose.yaml basta executar na pasta raiz da aplicação: ```$ docker-compose up -d```
+
+Curso disponível na plataforma [Alura](https://www.alura.com.br/), podendo ser acessado clicando [aqui](https://cursos.alura.com.br/course/kafka-introducao-a-streams-em-microservicos)
